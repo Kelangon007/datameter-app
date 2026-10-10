@@ -1,0 +1,16 @@
+{
+  "name": "Datameter Pro Live",
+  "short_name": "Datameter",
+  "description": "Live Population Dashboard Simulation",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#030710",
+  "theme_color": "#030710",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

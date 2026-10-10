@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pro Live Population - Responsive</title>
+<!-- INJEKSI PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#030710">
+<link rel="apple-touch-icon" href="icon.png">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background-color: #030710; color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; padding: 0; display: flex; justify-content: center;
+    overflow-x: hidden; position: relative; min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/41/Simple_world_map.svg');
+    background-size: cover; background-position: center;
+    filter: invert(1) opacity(0.12); z-index: -1;
+  }
+  .container {
+    width: 100%; max-width: 800px; background: rgba(8, 12, 18, 0.75);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    padding-bottom: 60px; position: relative;
+    border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+  }
+  .header-bar {
+    display: flex; justify-content: space-between; align-items: center; padding: 12px 15px;
+    background: linear-gradient(180deg, rgba(19,47,92,0.9) 0%, rgba(8,20,38,0.9) 100%);
+    border-bottom: 2px solid #3498db;
+  }
+  .brand { font-size: clamp(14px, 4vw, 18px); font-weight: 900; color: #fff; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+  .live-badge {
+    background-color: #e74c3c; color: white; padding: 4px 8px; border-radius: 3px;
+    font-size: 11px; font-weight: bold; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;
+  }
+  .blink { animation: blinker 1s linear infinite; }
+  @keyframes blinker { 50% { opacity: 0; } }
+  .world-section { text-align: center; padding: 20px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .world-title { font-size: clamp(12px, 3vw, 16px); color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .world-pop { font-size: clamp(32px, 10vw, 60px); font-weight: bold; color: #ffffff; font-family: 'Courier New', Courier, monospace; text-shadow: 0 0 20px rgba(255,255,255,0.2); word-break: break-all; }
+  .stats-grid { display: flex; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); background-color: rgba(0,0,0,0.3); }
+  .stats-col { width: 48%; text-align: center; }
+  .stats-header { background-color: rgba(0,0,0,0.6); padding: 6px 0; font-size: clamp(9px, 2.5vw, 12px); color: #888; font-weight: bold; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; }
+  .stat-item { margin-bottom: 10px; }
+  .stat-label { font-size: clamp(10px, 2.5vw, 13px); color: #777; margin-bottom: 2px; }
+  .stat-number { font-size: clamp(15px, 4vw, 22px); font-weight: bold; font-family: 'Courier New', Courier, monospace; }
+  .color-green { color: #2ecc71; text-shadow: 0 0 10px rgba(46,204,113,0.2); }
+  .color-red { color: #e74c3c; text-shadow: 0 0 10px rgba(231,76,60,0.2); }
+  .color-blue { color: #3498db; text-shadow: 0 0 10px rgba(52,152,219,0.2); }
+  .chart-section { padding: 20px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .section-title { font-size: clamp(10px, 2.5vw, 12px); color: #888; background-color: rgba(0,0,0,0.5); padding: 8px; text-align: center; letter-spacing: 1px; margin-bottom: 15px; border-radius: 4px; }
+  .bar-row { display: flex; align-items: center; margin-bottom: 12px; width: 100%; }
+  .bar-label { flex: 0 0 105px; font-size: clamp(11px, 3vw, 14px); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .bar-track { flex: 1 1 auto; height: 14px; background-color: rgba(0,0,0,0.6); border-radius: 3px; overflow: hidden; margin: 0 10px; border: 1px solid rgba(255,255,255,0.05); }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #2980b9 0%, #3498db 100%); transition: width 0.1s linear; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+  .bar-value { flex: 0 0 90px; text-align: right; font-size: clamp(12px, 3vw, 15px); font-family: 'Courier New', Courier, monospace; font-weight: bold; color: #ddd; }
+  .list-section { padding: 15px 15px 30px 15px; }
+  .list-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .list-info { display: flex; gap: 12px; font-size: clamp(12px, 3vw, 15px); align-items: center; }
+  .list-rank { color: #555; width: 20px; font-weight: bold; }
+  .list-name { color: #3498db; }
+  .ticker-wrap { position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background-color: #050505; border-top: 2px solid #e74c3c; display: flex; z-index: 100; }
+  .ticker-heading { background-color: #e74c3c; color: white; font-weight: 900; font-size: clamp(11px, 3vw, 14px); padding: 0 15px; display: flex; align-items: center; white-space: nowrap; z-index: 2; box-shadow: 5px 0 15px rgba(0,0,0,0.8); text-transform: uppercase; }
+  .ticker-move-container { flex-grow: 1; overflow: hidden; position: relative; display: flex; align-items: center; }
+  .ticker-text { display: inline-block; white-space: nowrap; animation: ticker 75s linear infinite; font-size: clamp(12px, 3vw, 15px); font-weight: 500; color: #ddd; }
+  .ticker-item { margin: 0 30px; }
+  .ticker-item::after { content: "■"; color: #e74c3c; margin-left: 30px; font-size: 10px; vertical-align: middle; }
+  .ticker-item:last-child::after { display: none; }
+  @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-bar">
+    <div class="brand">🌍 DATAMETER PRO</div>
+    <div class="live-badge"><span class="blink">●</span> LIVE</div>
+  </div>
+  <div class="world-section">
+    <div class="world-title">Current World Population</div>
+    <div class="world-pop" id="world-pop">8,321,379,093</div>
+  </div>
+  <div class="stats-grid">
+    <div class="stats-col">
+      <div class="stats-header">TODAY'S STATISTICS</div>
+      <div class="stat-item"><div class="stat-label">Births</div><div class="stat-number color-green" id="births-today">105,258</div></div>
+      <div class="stat-item"><div class="stat-label">Deaths</div><div class="stat-number color-red" id="deaths-today">49,598</div></div>
+      <div class="stat-item"><div class="stat-label">Net Population Growth</div><div class="stat-number color-blue" id="growth-today">55,660</div></div>
+    </div>
+    <div class="stats-col">
+      <div class="stats-header">THIS YEAR'S STATISTICS</div>
+      <div class="stat-item"><div class="stat-label">Births</div><div class="stat-number color-green" id="births-year">102,403,307</div></div>
+      <div class="stat-item"><div class="stat-label">Deaths</div><div class="stat-number color-red" id="deaths-year">48,252,918</div></div>
+      <div class="stat-item"><div class="stat-label">Net Population Growth</div><div class="stat-number color-blue" id="growth-year">54,150,389</div></div>
+    </div>
+  </div>
+  <div class="chart-section">
+    <div class="section-title">TOP 5 COMPARISON (LIVE CHART)</div>
+    <div id="bar-chart-container"></div>
+  </div>
+  <div class="list-section">
+    <div class="section-title">RANKING 6 - 10</div>
+    <div id="country-list"></div>
+  </div>
+</div>
+
+<div class="ticker-wrap">
+  <div class="ticker-heading">BREAKING NEWS</div>
+  <div class="ticker-move-container">
+    <div class="ticker-text">
+      <span class="ticker-item">UN projects global population will reach 9.7 billion by the year 2050</span>
+      <span class="ticker-item">India has officially surpassed China as the world's most populous nation</span>
+      <span class="ticker-item">Global life expectancy reached 72.8 years, an improvement of almost 9 years since 1990</span>
+      <span class="ticker-item" style="color: #f39c12; font-weight: bold;">DISCLAIMER: The data shown is a simulation based on mathematical estimates of real-time birth and death rates, not an actual live census</span>
+      <span class="ticker-item">Thank you for watching our 24/7 live broadcast. Please Like and Subscribe!</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Service Worker Registration (Buat PWA)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js');
+    });
+  }
+
+  // Data & Logika
+  let worldPop = 8321379093, birthsToday = 105258, deathsToday = 49598, birthsYear = 102403307, deathsYear = 48252918;
+  const countries = [
+    { rank: 1, flag: '🇮🇳', name: 'India', pop: 1480520814, rate: 0.05 }, { rank: 2, flag: '🇨🇳', name: 'China', pop: 1411993952, rate: 0.03 },
+    { rank: 3, flag: '🇺🇸', name: 'United States', pop: 349648329, rate: 0.015 }, { rank: 4, flag: '🇮🇩', name: 'Indonesia', pop: 288594701, rate: 0.012 },
+    { rank: 5, flag: '🇵🇰', name: 'Pakistan', pop: 260347317, rate: 0.014 }, { rank: 6, flag: '🇳🇬', name: 'Nigeria', pop: 243857162, rate: 0.016 },
+    { rank: 7, flag: '🇧🇷', name: 'Brazil', pop: 213854754, rate: 0.009 }, { rank: 8, flag: '🇧🇩', name: 'Bangladesh', pop: 178433883, rate: 0.011 },
+    { rank: 9, flag: '🇷🇺', name: 'Russia', pop: 142954643, rate: 0.003 }, { rank: 10, flag: '🇪🇹', name: 'Ethiopia', pop: 139951598, rate: 0.018 }
+  ];
+  const formatNum = (num) => Math.floor(num).toLocaleString('en-US');
+
+  function updateData() {
+    birthsToday += 0.07; deathsToday += 0.03; birthsYear += 0.07; deathsYear += 0.03;
+    let growthToday = birthsToday - deathsToday, growthYear = birthsYear - deathsYear;
+    worldPop += (0.07 - 0.03);
+
+    document.getElementById('world-pop').innerText = formatNum(worldPop);
+    document.getElementById('births-today').innerText = formatNum(birthsToday);
+    document.getElementById('deaths-today').innerText = formatNum(deathsToday);
+    document.getElementById('growth-today').innerText = formatNum(growthToday);
+    document.getElementById('births-year').innerText = formatNum(birthsYear);
+    document.getElementById('deaths-year').innerText = formatNum(deathsYear);
+    document.getElementById('growth-year').innerText = formatNum(growthYear);
+
+    const barContainer = document.getElementById('bar-chart-container');
+    let barHTML = ''; const maxPop = countries[0].pop;
+    for(let i=0; i<5; i++) {
+      let c = countries[i]; c.pop += c.rate; let percent = (c.pop / maxPop) * 100;
+      barHTML += `<div class="bar-row"><div class="bar-label"><span>${c.flag}</span> <span>${c.name}</span></div><div class="bar-track"><div class="bar-fill" style="width: ${percent}%;"></div></div><div class="bar-value">${formatNum(c.pop)}</div></div>`;
+    }
+    barContainer.innerHTML = barHTML;
+
+    const listContainer = document.getElementById('country-list'); let listHTML = '';
+    for(let i=5; i<10; i++) {
+      let c = countries[i]; c.pop += c.rate;
+      listHTML += `<div class="list-row"><div class="list-info"><span class="list-rank">${c.rank}</span><span>${c.flag}</span><span class="list-name">${c.name}</span></div><div class="bar-value">${formatNum(c.pop)}</div></div>`;
+    }
+    listContainer.innerHTML = listHTML;
+  }
+  setInterval(updateData, 40);
+</script>
+</body>
+</html>
